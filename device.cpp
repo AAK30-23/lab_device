@@ -278,6 +278,17 @@ Divider::Divider(int outputs_count) {
     outputAmount = outputs_count;
 }
 
+void Divider::updateOutputs() {
+    if (inputs.empty() || outputs.empty()) {
+        throw "Делитель должен иметь входные и выходные данные до обновления.";
+    }
+    double input_mass = inputs[0]->getMassFlow();
+    double output_mass = input_mass / outputs.size();
+
+    for (auto& output_stream : outputs) {
+        output_stream->setMassFlow(output_mass);
+    }
+}
 
 void testTooManyInputStreams(){
     streamcounter=0;
