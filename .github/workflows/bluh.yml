@@ -68,3 +68,17 @@ jobs:
         label: Test Coverage
         message: ${{ env.COVERAGE }}
         color: green
+
+
+    - name: Debug compilation
+      run: |
+        echo "=== Current directory ==="
+        pwd
+        echo "=== Files in directory ==="
+        ls -la
+        echo "=== Content of device.cpp (first 10 lines) ==="
+        head -10 device.cpp || echo "device.cpp not found"
+        echo "=== Attempting compilation ==="
+        g++ --coverage -g -O0 device.cpp -lgtest -lpthread -o test_executable
+        echo "=== Compilation result ==="
+        ls -la test_executable || echo "test_executable not created"
