@@ -303,6 +303,161 @@ void Divider::updateOutputs() {
     }
 }
 
+/**
+ * @brief Тест: делитель правильно делит поток на 3 равных выхода
+ */
+void testDividerDividesFlowEqually() {
+    std::cout << "Divider Test 1: Basic division..." << std::endl;
+    streamcounter = 0;
+    Divider d1(3);
+
+    auto s_in = std::make_shared<Stream>(++streamcounter);
+    auto s_out1 = std::make_shared<Stream>(++streamcounter);
+    auto s_out2 = std::make_shared<Stream>(++streamcounter);
+    auto s_out3 = std::make_shared<Stream>(++streamcounter);
+
+    s_in->setMassFlow(12.0);
+    d1.addInput(s_in);
+    d1.addOutput(s_out1);
+    d1.addOutput(s_out2);
+    d1.addOutput(s_out3);
+
+    d1.updateOutputs();
+
+    if (std::abs(s_out1->getMassFlow() - 4.0) < POSSIBLE_ERROR &&
+        std::abs(s_out2->getMassFlow() - 4.0) < POSSIBLE_ERROR &&
+        std::abs(s_out3->getMassFlow() - 4.0) < POSSIBLE_ERROR) {
+        std::cout << "✓ PASSED" << std::endl;
+    } else {
+        std::cout << "✗ FAILED" << std::endl;
+    }
+}
+
+/**
+ * @brief Тест: сумма выходных потоков = входному потоку
+ */
+void testDividerMassConservation() {
+    std::cout << "Divider Test 2: Mass conservation..." << std::endl;
+    streamcounter = 0;
+    Divider d1(2);
+
+    auto s_in = std::make_shared<Stream>(++streamcounter);
+    auto s_out1 = std::make_shared<Stream>(++streamcounter);
+    auto s_out2 = std::make_shared<Stream>(++streamcounter);
+
+    s_in->setMassFlow(10.0);
+    d1.addInput(s_in);
+    d1.addOutput(s_out1);
+    d1.addOutput(s_out2);
+
+    d1.updateOutputs();
+
+    double total_output = s_out1->getMassFlow() + s_out2->getMassFlow();
+    if (std::abs(total_output - 10.0) < POSSIBLE_ERROR) {
+        std::cout << "✓ PASSED" << std::endl;
+    } else {
+        std::cout << "✗ FAILED" << std::endl;
+    }
+}
+
+/**
+ * @brief Тест: поток не изменяется с 1 выходом
+ */
+void testDividerSingleOutput() {
+    std::cout << "Divider Test 3: Single output..." << std::endl;
+    streamcounter = 0;
+    Divider d1(1);
+
+    auto s_in = std::make_shared<Stream>(++streamcounter);
+    auto s_out = std::make_shared<Stream>(++streamcounter);
+
+    s_in->setMassFlow(8.0);
+    d1.addInput(s_in);
+    d1.addOutput(s_out);
+
+    d1.updateOutputs();
+
+    if (std::abs(s_out->getMassFlow() - 8.0) < POSSIBLE_ERROR) {
+        std::cout << "✓ PASSED" << std::endl;
+    } else {
+        std::cout << "✗ FAILED" << std::endl;
+    }
+}
+
+/**
+ * @brief Тест: исключение при отсутствии входного потока
+ */
+void testDividerThrowsWhenNoInput() {
+    std::cout << "Divider Test 4: Exception on no input..." << std::endl;
+    streamcounter = 0;
+    Divider d1(2);
+    auto s_out = std::make_shared<Stream>(++streamcounter);
+    d1.addOutput(s_out);
+    
+    try {
+        d1.updateOutputs();
+        std::cout << "✗ FAILED (should have thrown)" << std::endl;
+    } catch (const char* e) {
+        std::cout << "✓ PASSED" << std::endl;
+    }
+}
+
+/**
+ * @brief Тест: исключение при отсутствии выходных потоков
+ */
+void testDividerThrowsWhenNoOutputs() {
+    std::cout << "Divider Test 5: Exception on no outputs..." << std::endl;
+    streamcounter = 0;
+    Divider d1(2);
+    auto s_in = std::make_shared<Stream>(++streamcounter);
+    s_in->setMassFlow(10.0);
+    d1.addInput(s_in);
+    
+    try {
+        d1.updateOutputs();
+        std::cout << "✗ FAILED (should have thrown)" << std::endl;
+    } catch (const char* e) {
+        std::cout << "✓ PASSED" << std::endl;
+    }
+}
+
+/**
+ * @brief Тест: исключение при попытке добавить больше 1 входа
+ */
+void testDividerThrowsWhenTooManyInputs() {
+    std::cout << "Divider Test 6: Exception on too many inputs..." << std::endl;
+    streamcounter = 0;
+    Divider d1(2);
+
+    auto s_in1 = std::make_shared<Stream>(++streamcounter);
+    auto s_in2 = std::make_shared<Stream>(++streamcounter);
+    auto s_out = std::make_shared<Stream>(++streamcounter);
+
+    d1.addInput(s_in1);
+    
+    try {
+        d1.addInput(s_in2);
+        std::cout << "✗ FAILED (should have thrown)" << std::endl;
+    } catch (const char* e) {
+        std::cout << "✓ PASSED" << std::endl;
+    }
+}
+
+/**
+ * @brief Основная тестовая функция для Divider (отдельная тестовая функция)
+ */
+void runDividerTests() {
+    testDividerDividesFlowEqually();      // Тест 1
+    testDividerMassConservation();        // Тест 2  
+    testDividerSingleOutput();            // Тест 3
+    testDividerThrowsWhenNoInput();       // Тест 4
+    testDividerThrowsWhenNoOutputs();     // Тест 5
+    testDividerThrowsWhenTooManyInputs(); // Тест 6
+    
+}
+
+
+
 void testTooManyInputStreams(){
     streamcounter=0;
     
@@ -359,6 +514,8 @@ void tests(){
     shouldSetOutputsCorrectlyWithOneOutput();
     shouldCorrectOutputs();
     shouldCorrectInputs();
+
+     runDividerTests();
 }
 
 /**
