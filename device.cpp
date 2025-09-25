@@ -9,6 +9,7 @@
 #include <vector>
 #include <memory>
 #include <cmath>
+#include <gtest/gtest.h>
 
 using namespace std;
 
@@ -307,7 +308,7 @@ void Divider::updateOutputs() {
  * @brief Тест: делитель правильно делит поток на 3 равных выхода
  */
 void testDividerDividesFlowEqually() {
-    std::cout << "Divider Test 1: Basic division..." << std::endl;
+    std::cout << "DividerTest1: Разделение на выходы" << std::endl;
     streamcounter = 0;
     Divider d1(3);
 
@@ -327,9 +328,9 @@ void testDividerDividesFlowEqually() {
     if (std::abs(s_out1->getMassFlow() - 4.0) < POSSIBLE_ERROR &&
         std::abs(s_out2->getMassFlow() - 4.0) < POSSIBLE_ERROR &&
         std::abs(s_out3->getMassFlow() - 4.0) < POSSIBLE_ERROR) {
-        std::cout << "✓ PASSED" << std::endl;
+        std::cout << "Passed" << std::endl;
     } else {
-        std::cout << "✗ FAILED" << std::endl;
+        std::cout << "Failed" << std::endl;
     }
 }
 
@@ -337,7 +338,7 @@ void testDividerDividesFlowEqually() {
  * @brief Тест: сумма выходных потоков = входному потоку
  */
 void testDividerMassConservation() {
-    std::cout << "Divider Test 2: Mass conservation..." << std::endl;
+    std::cout << "DividerTest2: Cумма выходов = входу" << std::endl;
     streamcounter = 0;
     Divider d1(2);
 
@@ -354,9 +355,9 @@ void testDividerMassConservation() {
 
     double total_output = s_out1->getMassFlow() + s_out2->getMassFlow();
     if (std::abs(total_output - 10.0) < POSSIBLE_ERROR) {
-        std::cout << "✓ PASSED" << std::endl;
+        std::cout << "Passed" << std::endl;
     } else {
-        std::cout << "✗ FAILED" << std::endl;
+        std::cout << "Failed" << std::endl;
     }
 }
 
@@ -364,7 +365,7 @@ void testDividerMassConservation() {
  * @brief Тест: поток не изменяется с 1 выходом
  */
 void testDividerSingleOutput() {
-    std::cout << "Divider Test 3: Single output..." << std::endl;
+    std::cout << "DividerTest3: Один выход" << std::endl;
     streamcounter = 0;
     Divider d1(1);
 
@@ -378,9 +379,9 @@ void testDividerSingleOutput() {
     d1.updateOutputs();
 
     if (std::abs(s_out->getMassFlow() - 8.0) < POSSIBLE_ERROR) {
-        std::cout << "✓ PASSED" << std::endl;
+        std::cout << "Passed" << std::endl;
     } else {
-        std::cout << "✗ FAILED" << std::endl;
+        std::cout << "Failed" << std::endl;
     }
 }
 
@@ -388,7 +389,7 @@ void testDividerSingleOutput() {
  * @brief Тест: исключение при отсутствии входного потока
  */
 void testDividerThrowsWhenNoInput() {
-    std::cout << "Divider Test 4: Exception on no input..." << std::endl;
+    std::cout << "DividerTest4: Исключение при отсутствии входов" << std::endl;
     streamcounter = 0;
     Divider d1(2);
     auto s_out = std::make_shared<Stream>(++streamcounter);
@@ -396,9 +397,9 @@ void testDividerThrowsWhenNoInput() {
     
     try {
         d1.updateOutputs();
-        std::cout << "✗ FAILED (should have thrown)" << std::endl;
+        std::cout << "Failed" << std::endl;
     } catch (const char* e) {
-        std::cout << "✓ PASSED" << std::endl;
+        std::cout << "Passed" << std::endl;
     }
 }
 
@@ -406,7 +407,7 @@ void testDividerThrowsWhenNoInput() {
  * @brief Тест: исключение при отсутствии выходных потоков
  */
 void testDividerThrowsWhenNoOutputs() {
-    std::cout << "Divider Test 5: Exception on no outputs..." << std::endl;
+    std::cout << "DividerTest5: Исключение при отсутствии выходов" << std::endl;
     streamcounter = 0;
     Divider d1(2);
     auto s_in = std::make_shared<Stream>(++streamcounter);
@@ -415,9 +416,9 @@ void testDividerThrowsWhenNoOutputs() {
     
     try {
         d1.updateOutputs();
-        std::cout << "✗ FAILED (should have thrown)" << std::endl;
+        std::cout << "Failed" << std::endl;
     } catch (const char* e) {
-        std::cout << "✓ PASSED" << std::endl;
+        std::cout << "Passed" << std::endl;
     }
 }
 
@@ -425,7 +426,7 @@ void testDividerThrowsWhenNoOutputs() {
  * @brief Тест: исключение при попытке добавить больше 1 входа
  */
 void testDividerThrowsWhenTooManyInputs() {
-    std::cout << "Divider Test 6: Exception on too many inputs..." << std::endl;
+    std::cout << "DividerTest6: Исключение при слишком большем кол-ве входов" << std::endl;
     streamcounter = 0;
     Divider d1(2);
 
@@ -437,9 +438,9 @@ void testDividerThrowsWhenTooManyInputs() {
     
     try {
         d1.addInput(s_in2);
-        std::cout << "✗ FAILED (should have thrown)" << std::endl;
+        std::cout << "Failed" << std::endl;
     } catch (const char* e) {
-        std::cout << "✓ PASSED" << std::endl;
+        std::cout << "Passed" << std::endl;
     }
 }
 
