@@ -78,7 +78,7 @@ protected:
 public:
     /**
      * @brief Add an input stream to the device.
-     * @param s A shared pointer to the input stream.
+     * @param s A shared_ptr to the input stream.
      */
     void addInput(shared_ptr<Stream> s){
       if(inputs.size() < inputAmount) inputs.push_back(s);
@@ -86,7 +86,7 @@ public:
     }
     /**
      * @brief Add an output stream to the device.
-     * @param s A shared pointer to the output stream.
+     * @param s A shared_ptr to the output stream.
      */
     void addOutput(shared_ptr<Stream> s){
       if(outputs.size() < outputAmount) outputs.push_back(s);
@@ -97,6 +97,12 @@ public:
      * @brief Update the output streams of the device (to be implemented by derived classes).
      */
     virtual void updateOutputs() = 0;
+
+    // Добавлены методы для доступа к потокам извне
+    shared_ptr<Stream> getInput(int index) { return inputs.at(index); }
+    shared_ptr<Stream> getOutput(int index) { return outputs.at(index); }
+    int getInputCount() { return inputs.size(); }
+    int getOutputCount() { return outputs.size(); }
 };
 
 class Mixer: public Device
@@ -106,6 +112,8 @@ class Mixer: public Device
     public:
       Mixer(int inputs_count): Device() {
         _inputs_count = inputs_count;
+        inputAmount = inputs_count;
+        outputAmount = MIXER_OUTPUTS;
       }
       void addInput(shared_ptr<Stream> s) {
         if (inputs.size() == _inputs_count) {
@@ -129,7 +137,7 @@ class Mixer: public Device
           throw "Should set outputs before update"s;
         }
 
-        double output_mass = sum_mass_flow / outputs.size(); // divide 0
+        double output_mass = sum_mass_flow / outputs.size();
 
         for (auto& output_stream : outputs) {
           output_stream -> setMassFlow(output_mass);
@@ -153,7 +161,7 @@ void shouldSetOutputsCorrectlyWithOneOutput() {
 
     d1.updateOutputs();
 
-    if (abs(s3->getMassFlow()) - 15 < POSSIBLE_ERROR) {
+    if (abs(s3->getMassFlow() - 15) < POSSIBLE_ERROR) {
       cout << "Test 1 passed"s << endl;
     } else {
       cout << "Test 1 failed"s << endl;
@@ -220,14 +228,16 @@ class Reactor : public Device{
 public:
     Reactor(bool isDoubleReactor) {
         inputAmount = 1;
-        if (isDoubleReactor) outputAmount = 2;
-        else inputAmount = 1;
+        if (isDoubleReactor) 
+            outputAmount = 2;
+        else 
+            outputAmount = 1;
     }
     
     void updateOutputs() override{
         double inputMass = inputs.at(0) -> getMassFlow();
-            for(int i = 0; i < outputAmount; i++){
-            double outputLocal = inputMass * (1/outputAmount);
+        for(int i = 0; i < outputAmount; i++){
+            double outputLocal = inputMass * (1.0/outputAmount);
             outputs.at(i) -> setMassFlow(outputLocal);
         }
     }
@@ -236,66 +246,77 @@ public:
 void testTooManyOutputStreams(){
     streamcounter=0;
     
-    Reactor dl = new Reactor(false);
+    Reactor dl(false);
     
     shared_ptr<Stream> s1(new Stream(++streamcounter));
     shared_ptr<Stream> s2(new Stream(++streamcounter));
     shared_ptr<Stream> s3(new Stream(++streamcounter));
     s1->setMassFlow(10.0);
-    s2->setMassFlow(5.0);
     dl.addInput(s1);
     dl.addOutput(s2);
     try{
         dl.addOutput(s3);
-    } catch(const string ex){
-         if (ex == "OUTPUT STREAM LIMIT!")
+    } catch(const char* ex){
+         if (string(ex) == "OUTPUT STREAM LIMIT!")
             cout << "Test 1 passed" << endl;
-
         return;
     }
     
-     cout << "Test 1 failed" << endl;
+    cout << "Test 1 failed" << endl;
 }
+
+
+class Divider : public Device
+{
+public:
+    Divider(int outputs_count);
+    void updateOutputs() override;
+};
+
 
 void testTooManyInputStreams(){
     streamcounter=0;
     
-    Reactor dl = new Reactor(false);
+    Reactor dl(false);
     
     shared_ptr<Stream> s1(new Stream(++streamcounter));
+    shared_ptr<Stream> s2(new Stream(++streamcounter));
     shared_ptr<Stream> s3(new Stream(++streamcounter));
     s1->setMassFlow(10.0);
     s2->setMassFlow(5.0);
     dl.addInput(s1);
     try{
         dl.addInput(s3);
-    } catch(const string ex){
-         if (ex == "INPUT STREAM LIMIT!")
+    } catch(const char* ex){
+         if (string(ex) == "INPUT STREAM LIMIT!")
             cout << "Test 2 passed" << endl;
-
         return;
     }
     
-     cout << "Test 2 failed"s << endl;
+    cout << "Test 2 failed"s << endl;
 }
 
 void testInputEqualOutput(){
-        streamcounter=0;
+    streamcounter=0;
     
-    Reactor dl = new Reactor(true);
+    Reactor dl(true);
     
     shared_ptr<Stream> s1(new Stream(++streamcounter));
     shared_ptr<Stream> s2(new Stream(++streamcounter));
     shared_ptr<Stream> s3(new Stream(++streamcounter));
     s1->setMassFlow(10.0);
-    s2->setMassFlow(5.0);
     dl.addInput(s1);
     dl.addOutput(s2);
     dl.addOutput(s3);
     
     dl.updateOutputs();
     
-    if(dl.outputs.at(0).getMassFlow + dl.outputs.at(1).getMassFlow == dl.inputs.at(0).getMassFlow)
+    // Используем публичные методы для доступа к данным
+    double output1 = dl.getOutput(0)->getMassFlow();
+    double output2 = dl.getOutput(1)->getMassFlow();
+    double input = dl.getInput(0)->getMassFlow();
+    
+    if(abs((output1 + output2) - input) < POSSIBLE_ERROR)
         cout << "Test 3 passed" << endl;
     else
         cout << "Test 3 failed" << endl;
@@ -328,19 +349,6 @@ int main()
     s1->setMassFlow(10.0);
     s2->setMassFlow(5.0);
 
-    // Create a device (e.g., Mixer) and add input/output streams
-    // Mixer d1;
-    // d1.addInput(s1);
-    // d1.addInput(s2);
-    // d1.addOutput(s3);
-
-    // Update the outputs of the device
-    // d1.updateOutputs();
-
-    // Print stream information
-//    s1->print();
-//    s2->print();
-//    s3->print();
     tests();
 
     return 0;
