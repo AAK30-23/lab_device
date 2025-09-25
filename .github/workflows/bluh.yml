@@ -2,9 +2,9 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ "main", "divider" ]
+    branches: [ "divider" ]
   pull_request:
-    branches: [ "main", "divider" ]
+    branches: [ "divider" ]
 
 jobs:
   build:
