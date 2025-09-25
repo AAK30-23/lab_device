@@ -16,17 +16,19 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y googletest libgtest-dev build-essential gcovr
+        sudo apt-get install -y g++ gcovr libgtest-dev
         
     - name: Calculate code coverage and tests
       id: covr
       run: |
-        # Используем готовые библиотеки Google Test
-        g++ --coverage -g -O0 -fprofile-arcs -ftest-coverage device.cpp -lgtest -lgtest_main -lpthread -o test_executable
+        g++ --coverage -g -O0 -fprofile-arcs -ftest-coverage device.cpp -lgtest -lpthread -o test_executable
+        
+        ls -la test_executable || echo "test_executable not found"
+        ls -la *.cpp || echo "No cpp files found"
+        
         chmod +x ./test_executable
         ./test_executable
         
-        # Генерируем отчет coverage
         gcovr --xml coverage.cobertura.xml
 
     - name: Code Coverage Report
@@ -55,6 +57,7 @@ jobs:
         cat code-coverage-results.md
         COVVALUE="$(grep 'Summary' code-coverage-results.md | awk '{print $3}' | tr -d \*)"
         echo "COVERAGE=$COVVALUE" >> $GITHUB_ENV
+        echo "Coverage: $COVVALUE"
     
     - name: Create the Badge
       uses: schneegans/dynamic-badges-action@v1.0.0
