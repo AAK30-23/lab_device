@@ -273,6 +273,11 @@ public:
     void updateOutputs() override;
 };
 
+Divider::Divider(int outputs_count) {
+    inputAmount = 1;
+    outputAmount = outputs_count;
+}
+
 
 void testTooManyInputStreams(){
     streamcounter=0;
