@@ -266,10 +266,23 @@ void testTooManyOutputStreams(){
 }
 
 
+/**
+* @class Divider
+* @brief Устройство, разделяющее один вх поток на N вых потоков с равным массовым расходом.
+*/
 class Divider : public Device
 {
 public:
+    /**
+    * @brief Создание нового делителя.
+    * @param outputs_count Число вых потоков.
+    */
     Divider(int outputs_count);
+     /**
+    * @brief Обновляет массовый расход всех вых потоков.
+    * @details Разделение вх массового расхода поровну между всеми вых.
+    * @throw Выдает исключение при незаданных вх/вых.
+    */
     void updateOutputs() override;
 };
 
