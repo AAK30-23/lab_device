@@ -1,2 +1,10 @@
 # lab_device
 Laboratory task for Github Actions/testing
+
+![C++ workflow](https://github.com/imitrichev/Training_2022/actions/workflows/c-cpp.yml/badge.svg) https://github.com/AAK30-23/lab_device/tree/divider/.github/workflows/coverage.yml/badge.svg
+![My Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/imitrichev/25038fb53c9796ef9018d44ca597f1fd/raw/Training_2022_main.json)
+https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/AAK30-23/0062b412a085249828efa9ad60c6d21e/raw/lab_device_main.json
+# Repo
+Note: test coverage is measured only for device.cpp file! (see yml)
+
+Code coverage badge updates ~5 minutes (cache lifetime in shield.io)
