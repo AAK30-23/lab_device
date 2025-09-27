@@ -1,4 +1,3 @@
-
 CXXFLAGS=-std=c++17 -pthread -I.
 CXX=g++
 COVERAGE_FLAGS=--coverage -g -O0 -fprofile-arcs -ftest-coverage
@@ -17,7 +16,11 @@ test: device.cpp
 run_tests: test
 	./test_executable
 
+# Добавьте эту цель - она будет запускать тесты
+check: test
+	./test_executable
+
 clean:
 	$(RM) device test_executable *.gcno *.gcda *.gcov
 
-.PHONY: all test run_tests clean
+.PHONY: all test run_tests clean check
